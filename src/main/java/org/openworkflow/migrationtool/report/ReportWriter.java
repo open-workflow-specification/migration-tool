@@ -1,4 +1,4 @@
-package com.specconvert.report;
+package org.openworkflow.migrationtool.report;
 
 import java.io.IOException;
 import java.nio.file.Path;

@@ -1,23 +1,23 @@
-package com.specconvert;
+package org.openworkflow.migrationtool;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.specconvert.report.MigrationReport;
-import com.specconvert.report.ReportCollector;
-import com.specconvert.report.ReportWriter;
-import com.specconvert.validator.OutputValidator;
-import com.specconvert.validator.ValidationResult;
-import com.specconvert.transformer.Callback;
-import com.specconvert.transformer.Event;
-import com.specconvert.transformer.ForEach;
-import com.specconvert.transformer.Inject;
-import com.specconvert.transformer.Operation;
-import com.specconvert.transformer.Parallel;
-import com.specconvert.transformer.Sleep;
-import com.specconvert.transformer.Switch;
-import com.specconvert.transformer.util;
+import org.openworkflow.migrationtool.report.MigrationReport;
+import org.openworkflow.migrationtool.report.ReportCollector;
+import org.openworkflow.migrationtool.report.ReportWriter;
+import org.openworkflow.migrationtool.validator.OutputValidator;
+import org.openworkflow.migrationtool.validator.ValidationResult;
+import org.openworkflow.migrationtool.transformer.Callback;
+import org.openworkflow.migrationtool.transformer.Event;
+import org.openworkflow.migrationtool.transformer.ForEach;
+import org.openworkflow.migrationtool.transformer.Inject;
+import org.openworkflow.migrationtool.transformer.Operation;
+import org.openworkflow.migrationtool.transformer.Parallel;
+import org.openworkflow.migrationtool.transformer.Sleep;
+import org.openworkflow.migrationtool.transformer.Switch;
+import org.openworkflow.migrationtool.transformer.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -363,8 +363,8 @@ public class SpecConvert {
                 System.err.println("[WARN] Unsupported state type for state '"
                         + stateName + "' (" + state.getClass().getSimpleName() + "); skipping.");
                 ReportCollector.get().addIssue(
-                        com.specconvert.report.MigrationReport.Severity.ERROR,
-                        com.specconvert.report.MigrationReport.Category.unsupported_feature,
+                        org.openworkflow.migrationtool.report.MigrationReport.Severity.ERROR,
+                        org.openworkflow.migrationtool.report.MigrationReport.Category.unsupported_feature,
                         "states[" + stateName + "]",
                         "State type " + state.getClass().getSimpleName() + " has no 1.0 equivalent; state was skipped.",
                         null, null, "Manually implement this state in the converted workflow.");

@@ -1,9 +1,9 @@
-package com.specconvert.transformer;
+package org.openworkflow.migrationtool.transformer;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.specconvert.report.MigrationReport.Category;
-import com.specconvert.report.MigrationReport.Severity;
-import com.specconvert.report.ReportCollector;
+import org.openworkflow.migrationtool.report.MigrationReport.Category;
+import org.openworkflow.migrationtool.report.MigrationReport.Severity;
+import org.openworkflow.migrationtool.report.ReportCollector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.nio.file.Path;

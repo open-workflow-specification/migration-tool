@@ -1,4 +1,4 @@
-package com.specconvert.report;
+package org.openworkflow.migrationtool.report;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;

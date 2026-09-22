@@ -1,4 +1,4 @@
-package com.specconvert.validator;
+package org.openworkflow.migrationtool.validator;
 
 /**
  * A single finding produced by {@link OutputValidator}.

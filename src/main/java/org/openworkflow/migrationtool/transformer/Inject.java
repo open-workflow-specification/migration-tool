@@ -1,4 +1,4 @@
-package com.specconvert.transformer;
+package org.openworkflow.migrationtool.transformer;
 
 import io.serverlessworkflow.api.states.InjectState;
 import io.serverlessworkflow.api.types.Set;

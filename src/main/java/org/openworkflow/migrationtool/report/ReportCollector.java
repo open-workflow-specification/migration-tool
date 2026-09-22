@@ -1,9 +1,9 @@
-package com.specconvert.report;
+package org.openworkflow.migrationtool.report;
 
-import com.specconvert.report.MigrationReport.Category;
-import com.specconvert.report.MigrationReport.Issue;
-import com.specconvert.report.MigrationReport.ManualTask;
-import com.specconvert.report.MigrationReport.Severity;
+import org.openworkflow.migrationtool.report.MigrationReport.Category;
+import org.openworkflow.migrationtool.report.MigrationReport.Issue;
+import org.openworkflow.migrationtool.report.MigrationReport.ManualTask;
+import org.openworkflow.migrationtool.report.MigrationReport.Severity;
 
 /**
  * Call-scoped collector for migration issues and manual tasks.

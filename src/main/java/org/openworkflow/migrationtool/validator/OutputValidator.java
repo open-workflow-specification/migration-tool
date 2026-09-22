@@ -1,4 +1,4 @@
-package com.specconvert.validator;
+package org.openworkflow.migrationtool.validator;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.util.ArrayList;

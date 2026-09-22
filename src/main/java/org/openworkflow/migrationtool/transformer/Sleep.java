@@ -1,4 +1,4 @@
-package com.specconvert.transformer;
+package org.openworkflow.migrationtool.transformer;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

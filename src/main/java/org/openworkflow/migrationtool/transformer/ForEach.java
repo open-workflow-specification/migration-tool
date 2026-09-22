@@ -1,8 +1,8 @@
-package com.specconvert.transformer;
+package org.openworkflow.migrationtool.transformer;
 
-import com.specconvert.report.MigrationReport.Category;
-import com.specconvert.report.MigrationReport.Severity;
-import com.specconvert.report.ReportCollector;
+import org.openworkflow.migrationtool.report.MigrationReport.Category;
+import org.openworkflow.migrationtool.report.MigrationReport.Severity;
+import org.openworkflow.migrationtool.report.ReportCollector;
 import java.util.ArrayList;
 import java.util.List;
 
