@@ -118,10 +118,12 @@ public class SpecConvert {
                     throw new IllegalArgumentException("--report-format requires 'json' or 'markdown' as an argument.");
                 }
                 String val = args[++i];
-                if ("json".equals(val) || "markdown".equals(val)) {
+                 if ("json".equals(val)) {
                     reportFormat = val;
+                } else if ("markdown".equals(val) || "md".equals(val)) {
+                    reportFormat = "markdown";
                 } else {
-                    throw new IllegalArgumentException("--report-format requires 'json' or 'markdown', got: '" + val + "'.");
+                    throw new IllegalArgumentException("--report-format requires 'json', 'md', or 'markdown', got: '" + val + "'.");
                 }
             } else if ("--strict".equals(args[i])) {
                 if (i + 1 >= args.length) {

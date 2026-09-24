@@ -1,6 +1,6 @@
 # SpecConvert — Conversion Logic Notes
 
-CNCF Serverless Workflow **0.8 → 1.0** | `src/main/java/com/specconvert/SpecConvert.java`
+CNCF Serverless Workflow **0.8 → 1.0** | `src/main/java/org/openworkflow/migrationtool/SpecConvert.java`
 
 ---
 
@@ -470,7 +470,7 @@ Used by the `sleep` → `wait` conversion. The regex `P(?:(\d+)Y)?(?:(\d+)M)?(?:
 
 ## Output Validation
 
-After the converted file is written, `OutputValidator` (`src/main/java/com/specconvert/validator/OutputValidator.java`) reads it back as a `JsonNode` and checks every translated element. Findings become `validation`-category issues in the migration report.
+After the converted file is written, `OutputValidator` (`src/main/java/org/openworkflow/migrationtool/validator/OutputValidator.java`) reads it back as a `JsonNode` and checks every translated element. Findings become `validation`-category issues in the migration report.
 
 | Task type | Key checks                                                                 |
 |-----------|---------------------------------------------------------------------------|

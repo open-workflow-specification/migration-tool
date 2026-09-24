@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Installs swf-migrate to /usr/local/bin (or ~/bin if not writable).
-# Usage: curl -fsSL https://raw.githubusercontent.com/skavgou/spec-convert/main/install.sh | bash
+# Usage: curl -fsSL https://raw.githubusercontent.com/open-workflow-specification/migration-tool/main/install.sh | bash
 set -euo pipefail
 
-REPO="skavgou/spec-convert"
+REPO="open-workflow-specification/migration-tool"
 INSTALL_DIR="/usr/local/bin"
 
 # Detect platform

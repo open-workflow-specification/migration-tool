@@ -32,7 +32,7 @@ public class ForEach {
     }
 
     protected static TaskItem handleForEachFunction(String name, ForEachState state) {
-        String in = state.getInputCollection() != null ? state.getInputCollection() : "${ .[] }";
+        String in = state.getInputCollection() != null ? util.stripExpressionWrapper(state.getInputCollection()) : ".[]";
         String each = state.getIterationParam() != null ? state.getIterationParam() : "item";
 
         System.err.println("[INFO] Converting forEach state '" + name

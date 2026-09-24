@@ -1,8 +1,8 @@
 # Installs swf-migrate to $Env:USERPROFILE\bin and adds it to the user PATH.
-# Usage: irm https://raw.githubusercontent.com/skavgou/spec-convert/main/install.ps1 | iex
+# Usage: irm https://raw.githubusercontent.com/open-workflow-specification/migration-tool/main/install.ps1 | iex
 $ErrorActionPreference = 'Stop'
 
-$Repo   = "skavgou/spec-convert"
+$Repo   = "open-workflow-specification/migration-tool"
 $Asset  = "swf-migrate-windows.exe"
 $BinDir = "$Env:USERPROFILE\bin"
 

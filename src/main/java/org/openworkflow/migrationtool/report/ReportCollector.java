@@ -89,7 +89,7 @@ public class ReportCollector {
             report.summary.overallStatus = "success";
         }
 
-        return strict && warnings > 0;
+        return errors > 0 || (strict && warnings > 0);
     }
 
     public MigrationReport getReport() {

@@ -91,7 +91,7 @@ public class Callback {
 
         // Named case: when the expected callback event type is confirmed, go to the transition target
         SwitchCase callbackCase = new SwitchCase()
-                .withWhen("${ .type == \"" + cloudEventType + "\" }")
+                 .withWhen(".type == \"" + cloudEventType + "\"")
                 .withThen(new FlowDirective().withString(transitionTarget));
 
         // Default case: fallback — end the workflow segment (should not be reached in normal flow)
