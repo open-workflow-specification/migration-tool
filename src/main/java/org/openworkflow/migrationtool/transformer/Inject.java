@@ -1,6 +1,7 @@
 package org.openworkflow.migrationtool.transformer;
 
 import io.serverlessworkflow.api.states.InjectState;
+import io.serverlessworkflow.api.types.FlowDirective;
 import io.serverlessworkflow.api.types.Set;
 import io.serverlessworkflow.api.types.SetTask;
 import io.serverlessworkflow.api.types.SetTaskConfiguration;
@@ -21,7 +22,11 @@ public class Inject {
             );
         }
 
+        FlowDirective then = util.resolveThen(name, state);
         SetTask setTask = new SetTask().withSet(new Set().withSetTaskConfiguration(cfg));
+        if (then != null) {
+            setTask.withThen(then);
+        }
         return new TaskItem(name, new Task().withSetTask(setTask));
     }
 }

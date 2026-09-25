@@ -9,6 +9,7 @@ import io.serverlessworkflow.api.branches.Branch;
 import io.serverlessworkflow.api.states.ParallelState;
 
 // 1.0
+import io.serverlessworkflow.api.types.FlowDirective;
 import io.serverlessworkflow.api.types.ForkTask;
 import io.serverlessworkflow.api.types.ForkTaskConfiguration;
 import io.serverlessworkflow.api.types.Task;
@@ -56,6 +57,10 @@ public class Parallel {
                 .withBranches(branchItems);
 
         ForkTask forkTask = new ForkTask().withFork(forkCfg);
+        FlowDirective then = util.resolveThen(name, state);
+        if (then != null) {
+            forkTask.withThen(then);
+        }
         return new TaskItem(name, new Task().withForkTask(forkTask));
     }
 }

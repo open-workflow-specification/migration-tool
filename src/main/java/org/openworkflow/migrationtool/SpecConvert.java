@@ -341,7 +341,7 @@ public class SpecConvert {
                 items.add(Inject.handleInject(stateName, (InjectState) state));
 
             } else if (state instanceof SleepState) {
-                items.add(new TaskItem(stateName, new Task().withWaitTask(Sleep.handleWait((SleepState) state))));
+                items.add(Sleep.handleSleep(stateName, (SleepState) state));
 
             } else if (state instanceof SwitchState) {
                 items.add(Switch.handleSwitch(stateName, (SwitchState) state, eventTypeByName));

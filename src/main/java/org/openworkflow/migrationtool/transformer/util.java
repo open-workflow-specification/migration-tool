@@ -12,11 +12,14 @@ import java.util.HashMap;
 // 0.8
 import io.serverlessworkflow.api.actions.Action;
 import io.serverlessworkflow.api.events.EventDefinition;
+import io.serverlessworkflow.api.states.DefaultState;
 import io.serverlessworkflow.api.transitions.Transition;
 
 // 1.0
 import io.serverlessworkflow.api.types.CallFunction;
 import io.serverlessworkflow.api.types.CallTask;
+import io.serverlessworkflow.api.types.FlowDirective;
+import io.serverlessworkflow.api.types.FlowDirectiveEnum;
 import io.serverlessworkflow.api.types.FunctionArguments;
 import io.serverlessworkflow.api.types.Set;
 import io.serverlessworkflow.api.types.SetTask;
@@ -73,6 +76,39 @@ public class util {
     protected static String transitionName(Transition t) {
         if (t == null || t.getNextState() == null) return "TODO";
         return t.getNextState();
+    }
+
+    /**
+     * Derive a 1.0 FlowDirective from the transition/end fields of a 0.8 state.
+     *
+     * Rules:
+     *   - transition present → FlowDirective pointing to the next state name
+     *   - end present        → FlowDirectiveEnum.END
+     *   - neither            → null (no then emitted; runtime falls through to the next task)
+     *
+     * When neither field is set and the state is not the terminal node (rare but valid in 0.8),
+     * the generated 1.0 workflow will fall through to the next task in the do list, which matches
+     * the default 0.8 sequential behaviour only if the state is listed in order.  A warning is
+     * emitted so the user can verify the output.
+     */
+    public static FlowDirective resolveThen(String stateName, DefaultState state) {
+        if (state.getTransition() != null && state.getTransition().getNextState() != null) {
+            return new FlowDirective().withString(state.getTransition().getNextState());
+        }
+        if (state.getEnd() != null) {
+            return new FlowDirective().withFlowDirectiveEnum(FlowDirectiveEnum.END);
+        }
+        // Neither transition nor end — emit a warning; fall-through is implicit in 1.0
+        System.err.println("[WARN] State '" + stateName
+                + "' has no transition or end; no 'then' directive will be set. "
+                + "Verify that sequential fall-through in the 1.0 do list is correct.");
+        ReportCollector.get().addIssue(Severity.WARNING, Category.state_transformation,
+                "states[" + stateName + "].transition",
+                "State has no transition or end; no 'then' directive was emitted. "
+                        + "Verify that sequential fall-through in the 1.0 do list is correct.",
+                null, null,
+                "Set the correct next state or end condition if fall-through is not intended.");
+        return null;
     }
 
     /**

@@ -11,6 +11,7 @@ import io.serverlessworkflow.api.actions.Action;
 import io.serverlessworkflow.api.states.ForEachState;
 
 // 1.0
+import io.serverlessworkflow.api.types.FlowDirective;
 import io.serverlessworkflow.api.types.ForTask;
 import io.serverlessworkflow.api.types.ForTaskConfiguration;
 import io.serverlessworkflow.api.types.Task;
@@ -74,6 +75,11 @@ public class ForEach {
         ForTask forTask = new ForTask()
                 .withFor(forCfg)
                 .withDo(doItems);
+
+        FlowDirective then = util.resolveThen(name, state);
+        if (then != null) {
+            forTask.withThen(then);
+        }
 
         return new TaskItem(name, new Task().withForTask(forTask));
     }

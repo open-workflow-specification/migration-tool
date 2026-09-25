@@ -8,24 +8,48 @@ import io.serverlessworkflow.api.states.SleepState;
 
 // 1.0
 import io.serverlessworkflow.api.types.DurationInline;
+import io.serverlessworkflow.api.types.FlowDirective;
+import io.serverlessworkflow.api.types.Task;
+import io.serverlessworkflow.api.types.TaskItem;
 import io.serverlessworkflow.api.types.TimeoutAfter;
 import io.serverlessworkflow.api.types.WaitTask;
 
 
 public class Sleep {
     /**
-     * Parse an ISO 8601 duration string (e.g. "P2DT3H4M") into a 1.0 wait block,
-     * preserving each component as a discrete field on DurationInline:
+     * Convert a 0.8 sleep state to a 1.0 TaskItem containing a wait task.
+     *
+     * The ISO 8601 duration string (e.g. "P2DT3H4M") is parsed into a DurationInline:
      * { "wait": { "days": 2, "hours": 3, "minutes": 4 } }
      *
      * Years and months are folded into days (approximate: 1y=365d, 1mo=30d)
      * because DurationInline has no year/month fields.
+     *
+     * The 0.8 transition/end fields are carried over as a 1.0 then directive.
      */
-    public static WaitTask handleWait(SleepState state) {
-        return handleWaitFunction(state);
+    public static TaskItem handleSleep(String name, SleepState state) {
+        return handleSleepFunction(name, state);
     }
 
-    private static WaitTask handleWaitFunction(SleepState state) {
+    /**
+     * @deprecated Use {@link #handleSleep(String, SleepState)} instead.
+     *             Retained for any existing callers that consume only the WaitTask.
+     */
+    @Deprecated
+    public static WaitTask handleWait(SleepState state) {
+        return buildWaitTask(state);
+    }
+
+    private static TaskItem handleSleepFunction(String name, SleepState state) {
+        WaitTask waitTask = buildWaitTask(state);
+        FlowDirective then = util.resolveThen(name, state);
+        if (then != null) {
+            waitTask.withThen(then);
+        }
+        return new TaskItem(name, new Task().withWaitTask(waitTask));
+    }
+
+    private static WaitTask buildWaitTask(SleepState state) {
         String iso8601Duration = state.getDuration();
         if (iso8601Duration == null) iso8601Duration = "PT0S";
 

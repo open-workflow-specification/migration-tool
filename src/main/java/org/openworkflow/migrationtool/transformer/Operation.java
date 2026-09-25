@@ -9,6 +9,7 @@ import io.serverlessworkflow.api.actions.Action;
 import io.serverlessworkflow.api.states.OperationState;
 
 // 1.0
+import io.serverlessworkflow.api.types.FlowDirective;
 import io.serverlessworkflow.api.types.ForkTask;
 import io.serverlessworkflow.api.types.ForkTaskConfiguration;
 import io.serverlessworkflow.api.types.Task;
@@ -38,6 +39,8 @@ public class Operation {
         System.err.println("[INFO] Converting operation state '" + name + "' (actionMode="
                 + (parallel ? "parallel" : "sequential") + ", actions=" + actions.size() + ")");
 
+        FlowDirective then = util.resolveThen(name, state);
+
         if (parallel) {
             // parallel → fork task; each action becomes its own branch
             List<TaskItem> branchItems = new ArrayList<>();
@@ -52,7 +55,11 @@ public class Operation {
             ForkTaskConfiguration forkCfg = new ForkTaskConfiguration()
                     .withCompete(false)
                     .withBranches(branchItems);
-            return new TaskItem(name, new Task().withForkTask(new ForkTask().withFork(forkCfg)));
+            ForkTask forkTask = new ForkTask().withFork(forkCfg);
+            if (then != null) {
+                forkTask.withThen(then);
+            }
+            return new TaskItem(name, new Task().withForkTask(forkTask));
         }
 
         // sequential → do task containing each action as a call task in order
@@ -62,6 +69,9 @@ public class Operation {
         }
         io.serverlessworkflow.api.types.DoTask doTask =
                 new io.serverlessworkflow.api.types.DoTask().withDo(actionItems);
+        if (then != null) {
+            doTask.withThen(then);
+        }
         return new TaskItem(name, new Task().withDoTask(doTask));
     }
 }

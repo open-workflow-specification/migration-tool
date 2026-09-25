@@ -1,9 +1,8 @@
 package org.openworkflow.migrationtool.transformer;
 
 import java.util.ArrayList;
-import java.util.Map;
-
 import java.util.List;
+import java.util.Map;
 
 // 0.8
 import io.serverlessworkflow.api.actions.Action;
@@ -13,8 +12,10 @@ import io.serverlessworkflow.api.states.EventState;
 // 1.0
 import io.serverlessworkflow.api.types.AllEventConsumptionStrategy;
 import io.serverlessworkflow.api.types.AnyEventConsumptionStrategy;
+import io.serverlessworkflow.api.types.DoTask;
 import io.serverlessworkflow.api.types.EventFilter;
 import io.serverlessworkflow.api.types.EventProperties;
+import io.serverlessworkflow.api.types.FlowDirective;
 import io.serverlessworkflow.api.types.ListenTask;
 import io.serverlessworkflow.api.types.ListenTaskConfiguration;
 import io.serverlessworkflow.api.types.ListenTo;
@@ -34,21 +35,33 @@ public class Event {
      * The CloudEvent type is resolved from the workflow's top-level event definitions;
      * if no definition is found the eventRef name itself is used as the type.
      *
-     * Actions mapping via foreach:
-     *   1.0 ListenTask carries a `foreach` (SubscriptionIterator) whose `do` list
-     *   executes for every consumed event. The iterator variable "item" holds
-     *   the received CloudEvent, so actions can inspect it.
+     * Per-event action association:
      *
-     *   All onEvents actions are flattened into a single do list. If different onEvents
-     *   entries have different actions, each distinct action list is appended in order.
-     *   If no onEvents entries have any actions, foreach is omitted entirely.
+     *   exclusive=true:
+     *     Only one event arrives. The foreach body must run only the actions associated
+     *     with the event that actually arrived.  Each onEvents entry becomes a separate
+     *     DoTask in the foreach.do list, guarded by an `if` expression that tests whether
+     *     the received event's `.type` matches any of the eventRefs in that entry.
+     *     Multiple eventRefs in one entry are OR-ed:
+     *       .item.type == "typeA" or .item.type == "typeB"
+     *     Tasks whose `if` is false are skipped at runtime, so only the matching group
+     *     executes — preserving the 0.8 per-event action association.
+     *
+     *   exclusive=false:
+     *     All events must arrive before actions run.  Because the runtime delivers all
+     *     events together, all actions from all onEvents entries should run.  Actions are
+     *     still grouped per onEvents entry (each entry becomes its own DoTask), which is
+     *     correct and preserves the 0.8 grouping; no if-guard is needed.
+     *
+     *   If an onEvents entry has no actions, no DoTask is emitted for it.
+     *   If no onEvents entry has any actions, foreach is omitted entirely.
      */
     public static TaskItem handleEvent(
             String name,
             EventState state,
             Map<String, String> eventTypeByName) {
-                return handleEventFunction(name, state, eventTypeByName);
-            }
+        return handleEventFunction(name, state, eventTypeByName);
+    }
 
     protected static TaskItem handleEventFunction(
             String name,
@@ -56,29 +69,54 @@ public class Event {
             Map<String, String> eventTypeByName) {
 
         List<EventFilter> filters = new ArrayList<>();
-
-        // Collect all actions across onEvents entries for the foreach do list
-        List<Action> allActions = new ArrayList<>();
+        // Each onEvents entry → one DoTask in the foreach body (if it has actions)
+        List<TaskItem> foreachGroups = new ArrayList<>();
+        boolean exclusive = state.isExclusive();
 
         if (state.getOnEvents() != null) {
             for (OnEvents onEvent : state.getOnEvents()) {
+                List<String> eventRefs = onEvent.getEventRefs() != null
+                        ? onEvent.getEventRefs() : java.util.Collections.emptyList();
                 List<Action> actions = onEvent.getActions() != null
                         ? onEvent.getActions() : java.util.Collections.emptyList();
 
-                if (onEvent.getEventRefs() != null) {
-                    for (String eventRef : onEvent.getEventRefs()) {
-                        String cloudEventType = eventTypeByName.getOrDefault(eventRef, eventRef);
-                        EventProperties props = new EventProperties().withType(cloudEventType);
-                        filters.add(new EventFilter().withWith(props));
-                    }
+                // Collect listen filters — one filter per eventRef
+                List<String> cloudEventTypes = new ArrayList<>();
+                for (String eventRef : eventRefs) {
+                    String cloudEventType = eventTypeByName.getOrDefault(eventRef, eventRef);
+                    cloudEventTypes.add(cloudEventType);
+                    filters.add(new EventFilter().withWith(new EventProperties().withType(cloudEventType)));
                 }
-                allActions.addAll(actions);
+
+                if (actions.isEmpty()) {
+                    continue; // no actions for this entry; skip DoTask generation
+                }
+
+                // Build the action task items for this onEvents entry
+                List<TaskItem> actionItems = new ArrayList<>();
+                for (Action action : actions) {
+                    actionItems.add(util.convertAction(action));
+                }
+
+                // Determine the key name for this group from the first eventRef (or a fallback)
+                String groupName = eventRefs.isEmpty() ? "onEvent" : util.toIdentifier(eventRefs.get(0));
+
+                DoTask groupTask = new DoTask().withDo(actionItems);
+
+                if (exclusive && !cloudEventTypes.isEmpty()) {
+                    // Guard: only execute this group when the received event matches one of
+                    // the eventRefs in this onEvents entry.
+                    groupTask.withIf(buildTypeGuard(cloudEventTypes));
+                }
+                // exclusive=false: no guard needed — all events have arrived, all actions run
+
+                foreachGroups.add(new TaskItem(groupName, new Task().withDoTask(groupTask)));
             }
         }
 
-        // exclusive=true → any (first matching event wins); exclusive=false → all (must all arrive)
+        // Build the listen directive
         ListenTo listenTo;
-        if (state.isExclusive()) {
+        if (exclusive) {
             listenTo = new ListenTo()
                     .withAnyEventConsumptionStrategy(new AnyEventConsumptionStrategy().withAny(filters));
         } else {
@@ -89,18 +127,38 @@ public class Event {
         ListenTask listenTask = new ListenTask()
                 .withListen(new ListenTaskConfiguration().withTo(listenTo));
 
-        // Build the foreach iterator only when at least one onEvents entry has actions
-        if (!allActions.isEmpty()) {
-            List<TaskItem> foreachDo = new ArrayList<>();
-            for (Action action : allActions) {
-                foreachDo.add(util.convertAction(action));
-            }
-            // item = the variable name that holds each received CloudEvent inside foreach.do
+        // Attach foreach only when there are action groups to dispatch
+        if (!foreachGroups.isEmpty()) {
             listenTask.withForeach(new SubscriptionIterator()
                     .withItem("item")
-                    .withDo(foreachDo));
+                    .withDo(foreachGroups));
+        }
+
+        FlowDirective then = util.resolveThen(name, state);
+        if (then != null) {
+            listenTask.withThen(then);
         }
 
         return new TaskItem(name, new Task().withListenTask(listenTask));
+    }
+
+    /**
+     * Build a jq boolean expression that is true when the received CloudEvent's type
+     * matches any of the given type strings.
+     *
+     * Single type:  .item.type == "com.example.typeA"
+     * Multiple:     (.item.type == "com.example.typeA" or .item.type == "com.example.typeB")
+     */
+    private static String buildTypeGuard(List<String> cloudEventTypes) {
+        if (cloudEventTypes.size() == 1) {
+            return ".item.type == \"" + cloudEventTypes.get(0) + "\"";
+        }
+        StringBuilder sb = new StringBuilder("(");
+        for (int i = 0; i < cloudEventTypes.size(); i++) {
+            if (i > 0) sb.append(" or ");
+            sb.append(".item.type == \"").append(cloudEventTypes.get(i)).append("\"");
+        }
+        sb.append(")");
+        return sb.toString();
     }
 }
