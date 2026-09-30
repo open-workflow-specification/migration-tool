@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs swf-migrate to /usr/local/bin (or ~/bin if not writable).
+# Installs ows-migrate to /usr/local/bin (or ~/bin if not writable).
 # Usage: curl -fsSL https://raw.githubusercontent.com/open-workflow-specification/migration-tool/main/install.sh | bash
 set -euo pipefail
 
@@ -9,8 +9,8 @@ INSTALL_DIR="/usr/local/bin"
 # Detect platform
 OS="$(uname -s)"
 case "$OS" in
-  Linux*)  ASSET="swf-migrate-linux" ;;
-  Darwin*) ASSET="swf-migrate-macos" ;;
+  Linux*)  ASSET="ows-migrate-linux" ;;
+  Darwin*) ASSET="ows-migrate-macos" ;;
   *)       echo "Unsupported OS: $OS" >&2; exit 1 ;;
 esac
 
@@ -26,7 +26,7 @@ fi
 URL="https://github.com/${REPO}/releases/download/${TAG}/${ASSET}"
 TMP=$(mktemp)
 
-echo "Downloading swf-migrate ${TAG} for ${OS}..."
+echo "Downloading ows-migrate ${TAG} for ${OS}..."
 curl -fsSL "$URL" -o "$TMP"
 chmod +x "$TMP"
 
@@ -38,6 +38,6 @@ if [[ ! -w "$INSTALL_DIR" ]]; then
   echo "Make sure $INSTALL_DIR is on your PATH."
 fi
 
-mv "$TMP" "${INSTALL_DIR}/swf-migrate"
-echo "Installed to ${INSTALL_DIR}/swf-migrate"
-echo "Run: swf-migrate --help"
+mv "$TMP" "${INSTALL_DIR}/ows-migrate"
+echo "Installed to ${INSTALL_DIR}/ows-migrate"
+echo "Run: ows-migrate --help"

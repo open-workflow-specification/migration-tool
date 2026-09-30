@@ -13,14 +13,14 @@ jobs:
       matrix:
         include:
           - os: ubuntu-latest
-            artifact: swf-migrate-linux
-            binary: target/swf-migrate
+            artifact: ows-migrate-linux
+            binary: target/ows-migrate
           - os: macos-latest
-            artifact: swf-migrate-macos
-            binary: target/swf-migrate
+            artifact: ows-migrate-macos
+            binary: target/ows-migrate
           - os: windows-latest
-            artifact: swf-migrate-windows.exe
-            binary: target/swf-migrate.exe
+            artifact: ows-migrate-windows.exe
+            binary: target/ows-migrate.exe
 
     steps:
       - uses: actions/checkout@v4
@@ -66,15 +66,15 @@ jobs:
 
       - name: Rename artifacts
         run: |
-          mv artifacts/swf-migrate-linux/swf-migrate        swf-migrate-linux
-          mv artifacts/swf-migrate-macos/swf-migrate        swf-migrate-macos
-          mv artifacts/swf-migrate-windows.exe/swf-migrate.exe swf-migrate-windows.exe
+          mv artifacts/ows-migrate-linux/ows-migrate        ows-migrate-linux
+          mv artifacts/ows-migrate-macos/ows-migrate        ows-migrate-macos
+          mv artifacts/ows-migrate-windows.exe/ows-migrate.exe ows-migrate-windows.exe
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            swf-migrate-linux
-            swf-migrate-macos
-            swf-migrate-windows.exe
+            ows-migrate-linux
+            ows-migrate-macos
+            ows-migrate-windows.exe
           generate_release_notes: true

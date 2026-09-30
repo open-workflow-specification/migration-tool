@@ -6,7 +6,7 @@ import java.util.List;
 
 /**
  * Validates a converted 1.0 Serverless Workflow document against the constraints that are
- * relevant to the 0.8→1.0 migration produced by {@code swf-migrate}.
+ * relevant to the 0.8→1.0 migration produced by {@code ows-migrate}.
  *
  * <h2>Scope</h2>
  * <p>Only elements that are the direct product of the translation are checked here.

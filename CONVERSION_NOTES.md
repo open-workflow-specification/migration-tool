@@ -17,7 +17,7 @@ The input file is parsed into a 0.8 SDK object (`io.serverlessworkflow.api.Workf
 ## CLI Usage
 
 ```
-swf-migrate <input-file> [options]
+ows-migrate <input-file> [options]
 
   -o, --output           Output file path (default: <input-stem>-migrated.yaml)
   -f, --format           Output format: yaml or json (default: yaml)

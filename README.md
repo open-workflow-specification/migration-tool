@@ -1,4 +1,4 @@
-# swf-migrate
+# ows-migrate
 
 CNCF Serverless Workflow **0.8 → 1.0** converter.
 
@@ -23,7 +23,7 @@ irm https://raw.githubusercontent.com/open-workflow-specification/migration-tool
 ## Usage
 
 ```
-swf-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>]
+ows-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>]
 ```
 
 | Flag | Description | Default |
@@ -42,25 +42,25 @@ swf-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>]
 
 ```bash
 # Default output → samples/hello-migrated.yaml
-swf-migrate samples/hello.json
+ows-migrate samples/hello.json
 
 # Explicit output path
-swf-migrate samples/hello.json -o results/hello-v1.yaml
+ows-migrate samples/hello.json -o results/hello-v1.yaml
 
 # Output as JSON
-swf-migrate samples/hello.json -f json
+ows-migrate samples/hello.json -f json
 
 # Custom output path and namespace
-swf-migrate samples/hello.json -o results/hello-v1.yaml -n my-org
+ows-migrate samples/hello.json -o results/hello-v1.yaml -n my-org
 
 # Custon report output
-swf-migrate samples/hello.json -r reports/hello-report.json
+ows-migrate samples/hello.json -r reports/hello-report.json
 
 # Report output as md
-swf-migrate samples/hello.json --report-format md
+ows-migrate samples/hello.json --report-format md
 
 # Strict Migration
-swf-migrate samples/hello.json --strict true
+ows-migrate samples/hello.json --strict true
 ```
 
 ---
@@ -98,7 +98,7 @@ Requires [GraalVM JDK 21](https://www.graalvm.org/downloads/) to build.
 
 ```bash
 mvn package -Pnative
-./target/swf-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>]
+./target/ows-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>]
 ```
 
 ---

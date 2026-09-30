@@ -152,7 +152,7 @@ public class util {
     }
 
     public static void printUsage() {
-        log.info("Usage: swf-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>] [--strict true|false] [--report-format json|markdown]");
+        log.info("Usage: ows-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>] [--strict true|false] [--report-format json|markdown]");
         log.info("Convert a CNCF Serverless Workflow spec 0.8 document to 1.0.");
         log.info("");
         log.info("  -o, --output           Output file path (default: <input-stem>-migrated.yaml)");

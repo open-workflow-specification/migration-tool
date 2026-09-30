@@ -120,7 +120,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <imageName>swf-migrate</imageName>
+                            <imageName>ows-migrate</imageName>
                             <mainClass>org.openworkflow.migrationtool.SpecConvert</mainClass>
                             <buildArgs>
                                 <buildArg>--no-fallback</buildArg>

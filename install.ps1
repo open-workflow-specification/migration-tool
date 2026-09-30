@@ -1,9 +1,9 @@
-# Installs swf-migrate to $Env:USERPROFILE\bin and adds it to the user PATH.
+# Installs ows-migrate to $Env:USERPROFILE\bin and adds it to the user PATH.
 # Usage: irm https://raw.githubusercontent.com/open-workflow-specification/migration-tool/main/install.ps1 | iex
 $ErrorActionPreference = 'Stop'
 
 $Repo   = "open-workflow-specification/migration-tool"
-$Asset  = "swf-migrate-windows.exe"
+$Asset  = "ows-migrate-windows.exe"
 $BinDir = "$Env:USERPROFILE\bin"
 
 # Resolve latest release tag
@@ -16,9 +16,9 @@ if (-not $Tag) {
 }
 
 $Url  = "https://github.com/$Repo/releases/download/$Tag/$Asset"
-$Dest = "$BinDir\swf-migrate.exe"
+$Dest = "$BinDir\ows-migrate.exe"
 
-Write-Host "Downloading swf-migrate $Tag for Windows..."
+Write-Host "Downloading ows-migrate $Tag for Windows..."
 New-Item -ItemType Directory -Force -Path $BinDir | Out-Null
 Invoke-WebRequest -Uri $Url -OutFile $Dest
 
@@ -30,4 +30,4 @@ if ($CurrentPath -notlike "*$BinDir*") {
 }
 
 Write-Host "Installed to $Dest"
-Write-Host "Run: swf-migrate --help"
+Write-Host "Run: ows-migrate --help"

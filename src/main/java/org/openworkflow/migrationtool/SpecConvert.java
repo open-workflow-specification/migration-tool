@@ -64,7 +64,7 @@ interface DurationInlineMixIn {}
  * Output is built via the 1.0 SDK (serverlessworkflow-types 7.25.0.Final).
  *
  * Usage:
- *   swf-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>] [--strict true|false] [--report-format json|markdown]
+ *   ows-migrate <input-file> [-o <output-file>] [-f yaml|json] [-n <namespace>] [--strict true|false] [--report-format json|markdown]
  *
  * Output defaults to <input-stem>-migrated.yaml if -o is not given.
  * Both JSON (.json) and YAML (.yaml / .yml) input files are supported.
@@ -79,7 +79,7 @@ public class SpecConvert {
             return;
         }
 
-        // Parse arguments: swf-migrate <input> [-o <output>]
+        // Parse arguments: ows-migrate <input> [-o <output>]
         Path inputPath = null;
         Path outputPath = null;
         Path reportPath = null;
