@@ -25,6 +25,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // 0.8
@@ -48,6 +49,7 @@ import io.serverlessworkflow.api.types.TaskItem;
 import jakarta.validation.constraints.Null;
 import io.serverlessworkflow.api.WorkflowFormat;
 import io.serverlessworkflow.api.WorkflowWriter;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.util.Map;
 
 // Workflow10 = io.serverlessworkflow.api.types.Workflow  (1.0 output)
@@ -216,7 +218,7 @@ public class SpecConvert {
         // Validate the serialised 1.0 output
         // ----------------------------------------------------------------
         ObjectMapper validationMapper = util.isYaml(outputPath)
-                ? new com.fasterxml.jackson.dataformat.yaml.YAMLMapper()
+                ? new YAMLMapper()
                 : new ObjectMapper();
         JsonNode outputTree = validationMapper.readTree(outputPath.toFile());
         List<ValidationResult> validationResults = new OutputValidator().validate(outputTree);

@@ -1,6 +1,7 @@
 package org.openworkflow.migrationtool.transformer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -76,9 +77,9 @@ public class Event {
         if (state.getOnEvents() != null) {
             for (OnEvents onEvent : state.getOnEvents()) {
                 List<String> eventRefs = onEvent.getEventRefs() != null
-                        ? onEvent.getEventRefs() : java.util.Collections.emptyList();
+                        ? onEvent.getEventRefs() : Collections.emptyList();
                 List<Action> actions = onEvent.getActions() != null
-                        ? onEvent.getActions() : java.util.Collections.emptyList();
+                        ? onEvent.getActions() : Collections.emptyList();
 
                 // Collect listen filters — one filter per eventRef
                 List<String> cloudEventTypes = new ArrayList<>();

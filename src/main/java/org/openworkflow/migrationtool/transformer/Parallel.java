@@ -9,6 +9,7 @@ import io.serverlessworkflow.api.branches.Branch;
 import io.serverlessworkflow.api.states.ParallelState;
 
 // 1.0
+import io.serverlessworkflow.api.types.DoTask;
 import io.serverlessworkflow.api.types.FlowDirective;
 import io.serverlessworkflow.api.types.ForkTask;
 import io.serverlessworkflow.api.types.ForkTaskConfiguration;
@@ -45,8 +46,8 @@ public class Parallel {
                 }
 
                 // Each branch becomes a TaskItem whose value is a DoTask containing its actions
-                io.serverlessworkflow.api.types.DoTask doTask =
-                        new io.serverlessworkflow.api.types.DoTask()
+                DoTask doTask =
+                        new DoTask()
                                 .withDo(actionItems);
                 branchItems.add(new TaskItem(branchName, new Task().withDoTask(doTask)));
             }

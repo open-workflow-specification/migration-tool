@@ -4,6 +4,7 @@ import org.openworkflow.migrationtool.report.MigrationReport.Category;
 import org.openworkflow.migrationtool.report.MigrationReport.Severity;
 import org.openworkflow.migrationtool.report.ReportCollector;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -77,7 +78,7 @@ public class Callback {
         ListenTo listenTo = new ListenTo()
                 .withAnyEventConsumptionStrategy(
                         new AnyEventConsumptionStrategy()
-                                .withAny(java.util.Collections.singletonList(filter)));
+                                .withAny(Collections.singletonList(filter)));
 
         ListenTask listenTask = new ListenTask()
                 .withListen(new ListenTaskConfiguration().withTo(listenTo));

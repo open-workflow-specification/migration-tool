@@ -1,7 +1,7 @@
 package org.openworkflow.migrationtool.transformer;
 
 import java.util.ArrayList;
-
+import java.util.Collections;
 import java.util.List;
 
 // 0.8
@@ -9,6 +9,7 @@ import io.serverlessworkflow.api.actions.Action;
 import io.serverlessworkflow.api.states.OperationState;
 
 // 1.0
+import io.serverlessworkflow.api.types.DoTask;
 import io.serverlessworkflow.api.types.FlowDirective;
 import io.serverlessworkflow.api.types.ForkTask;
 import io.serverlessworkflow.api.types.ForkTaskConfiguration;
@@ -33,7 +34,7 @@ public class Operation {
     }
 
     protected static TaskItem handleOperationFunction(String name, OperationState state) {
-        List<Action> actions = state.getActions() != null ? state.getActions() : java.util.Collections.emptyList();
+        List<Action> actions = state.getActions() != null ? state.getActions() : Collections.emptyList();
 
         boolean parallel = state.getActionMode() == OperationState.ActionMode.PARALLEL;
         System.err.println("[INFO] Converting operation state '" + name + "' (actionMode="
@@ -46,9 +47,9 @@ public class Operation {
             List<TaskItem> branchItems = new ArrayList<>();
             for (Action action : actions) {
                 TaskItem actionItem = util.convertAction(action);
-                io.serverlessworkflow.api.types.DoTask doTask =
-                        new io.serverlessworkflow.api.types.DoTask()
-                                .withDo(java.util.Collections.singletonList(actionItem));
+                DoTask doTask =
+                        new DoTask()
+                                .withDo(Collections.singletonList(actionItem));
                 String branchName = actionItem.getName() != null ? actionItem.getName() : "branch";
                 branchItems.add(new TaskItem(branchName, new Task().withDoTask(doTask)));
             }
@@ -67,8 +68,8 @@ public class Operation {
         for (Action action : actions) {
             actionItems.add(util.convertAction(action));
         }
-        io.serverlessworkflow.api.types.DoTask doTask =
-                new io.serverlessworkflow.api.types.DoTask().withDo(actionItems);
+        DoTask doTask =
+                new DoTask().withDo(actionItems);
         if (then != null) {
             doTask.withThen(then);
         }

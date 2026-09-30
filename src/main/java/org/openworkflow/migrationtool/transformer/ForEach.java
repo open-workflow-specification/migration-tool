@@ -4,6 +4,7 @@ import org.openworkflow.migrationtool.report.MigrationReport.Category;
 import org.openworkflow.migrationtool.report.MigrationReport.Severity;
 import org.openworkflow.migrationtool.report.ReportCollector;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // 0.8
@@ -61,7 +62,7 @@ public class ForEach {
         }
 
         List<Action> actions = state.getActions() != null
-                ? state.getActions() : java.util.Collections.emptyList();
+                ? state.getActions() : Collections.emptyList();
 
         List<TaskItem> doItems = new ArrayList<>();
         for (Action action : actions) {
