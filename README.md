@@ -1,6 +1,6 @@
 # ows-migrate
 
-CNCF Serverless Workflow **0.8 → 1.0** converter.
+Open Workflow **0.8 → 1.0** converter.
 
 ---
 
