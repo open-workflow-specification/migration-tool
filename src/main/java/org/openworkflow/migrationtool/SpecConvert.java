@@ -175,15 +175,15 @@ public class SpecConvert {
         if (reportPath != null) {
             String reportFileName = reportPath.getFileName().toString().toLowerCase();
             boolean extensionMatchesFormat;
-            if ("markdown".equals(reportFormat)) {
+            if ("markdown".equals(reportFormat) || "md".equals(reportFormat)) {
                 extensionMatchesFormat = reportFileName.endsWith(".md") || reportFileName.endsWith(".markdown");
             } else {
                 extensionMatchesFormat = reportFileName.endsWith(".json");
             }
             if (!extensionMatchesFormat) {
-                throw new IllegalArgumentException(
+                log.warn(
                         "Report path '" + reportPath.getFileName() + "' does not match --report-format '" + reportFormat + "'. "
-                        + "Expected extension: " + ("markdown".equals(reportFormat) ? ".md or .markdown" : ".json") + ".");
+                        + "Using extension format: " + ("markdown".equals(reportFormat) ? ".md or .markdown" : ".json") + ".");
             }
         }
 
@@ -204,8 +204,7 @@ public class SpecConvert {
         int totalStates = wf08.getStates() != null ? wf08.getStates().size() : 0;
 
         io.serverlessworkflow.api.types.Workflow wf10 = convert(wf08, namespace);
-
-        WorkflowFormat format = WorkflowFormat.fromPath(outputPath);
+        WorkflowFormat format = "json".equals(outFormat) ? WorkflowFormat.JSON : WorkflowFormat.YAML;
 
         // Suppress zero-valued duration fields (days:0, hours:0, etc.) from the output
         format.mapper().addMixIn(DurationInline.class, DurationInlineMixIn.class);
@@ -216,7 +215,7 @@ public class SpecConvert {
         // ----------------------------------------------------------------
         // Validate the serialised 1.0 output
         // ----------------------------------------------------------------
-        ObjectMapper validationMapper = util.isYaml(outputPath)
+        ObjectMapper validationMapper = "yaml".equals(outFormat)
                 ? new YAMLMapper()
                 : new ObjectMapper();
         JsonNode outputTree = validationMapper.readTree(outputPath.toFile());
