@@ -18,6 +18,8 @@ import org.openworkflow.migrationtool.transformer.Parallel;
 import org.openworkflow.migrationtool.transformer.Sleep;
 import org.openworkflow.migrationtool.transformer.Switch;
 import org.openworkflow.migrationtool.transformer.util;
+import org.openworkflow.migrationtool.report.MigrationReport.Category;
+import org.openworkflow.migrationtool.report.MigrationReport.Severity;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +27,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 // 0.8
@@ -44,9 +45,7 @@ import io.serverlessworkflow.api.interfaces.State;
 // 1.0
 import io.serverlessworkflow.api.types.Document;
 import io.serverlessworkflow.api.types.DurationInline;
-import io.serverlessworkflow.api.types.Task;
 import io.serverlessworkflow.api.types.TaskItem;
-import jakarta.validation.constraints.Null;
 import io.serverlessworkflow.api.WorkflowFormat;
 import io.serverlessworkflow.api.WorkflowWriter;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
@@ -158,12 +157,12 @@ public class SpecConvert {
             boolean isYamlExt = outputFileName.endsWith(".yaml") || outputFileName.endsWith(".yml");
 
             if (outFormatExplicit) {
-                // Both -o and -f supplied — they must agree.
+                // Both -o and -f supplied — use -o format
                 boolean matches = "json".equals(outFormat) ? isJsonExt : isYamlExt;
                 if (!matches) {
-                    throw new IllegalArgumentException(
+                    log.warn(
                             "Output path '" + outputPath.getFileName() + "' does not match -f '" + outFormat + "'. "
-                            + "Expected extension: " + ("yaml".equals(outFormat) ? ".yaml or .yml" : ".json") + ".");
+                            + "Using extension format: " + (isYamlExt ? "yaml" : "json") + ".");
                 }
             } else if (isJsonExt) {
                 // -o given alone with a .json extension — infer json format
@@ -367,8 +366,8 @@ public class SpecConvert {
                 System.err.println("[WARN] Unsupported state type for state '"
                         + stateName + "' (" + state.getClass().getSimpleName() + "); skipping.");
                 ReportCollector.get().addIssue(
-                        org.openworkflow.migrationtool.report.MigrationReport.Severity.ERROR,
-                        org.openworkflow.migrationtool.report.MigrationReport.Category.unsupported_feature,
+                        Severity.ERROR,
+                        Category.unsupported_feature,
                         "states[" + stateName + "]",
                         "State type " + state.getClass().getSimpleName() + " has no 1.0 equivalent; state was skipped.",
                         null, null, "Manually implement this state in the converted workflow.");
