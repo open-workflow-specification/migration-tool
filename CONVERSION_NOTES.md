@@ -173,12 +173,7 @@ Condition names are **camelCased** for use as YAML keys (e.g. `"Applicant is adu
 
 ##### EL expression handling
 
-0.8 conditions written as `${ ... }` are not valid jq. The converter:
-1. Strips the `${ }` wrapper from the `when` value.
-2. Logs a `[WARN]` to stderr.
-3. Adds a `WARNING / expression_conversion` issue to the migration report.
-
-These conditions require **manual translation** to jq syntax before the workflow will run correctly.
+0.8 conditions written as `${ ... }` are passed through to the 1.0 `when` value unchanged. The 1.0 spec supports (and encourages) the `${ }` wrapper around jq expressions, so no stripping or transformation is performed.
 
 ---
 
