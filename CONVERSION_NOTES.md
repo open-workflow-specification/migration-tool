@@ -29,7 +29,7 @@ ows-migrate <input-file> [options]
 
 ### Argument validation
 
-- `-o` and `-f` must agree on extension. Passing `-o out.json -f yaml` (or vice-versa) throws an `IllegalArgumentException` before any conversion work begins.
+- `-o` and `-f` should agree on extension. Passing `-o out.json -f yaml` (or vice-versa) will default to the file extension passed in the `-o` argument.
 - `--report` and `--report-format` are subject to the same check (`.json` ↔ `json`, `.md`/`.markdown` ↔ `markdown`).
 
 ---
