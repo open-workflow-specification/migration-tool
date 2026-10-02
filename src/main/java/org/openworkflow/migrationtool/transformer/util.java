@@ -132,23 +132,12 @@ public class util {
     }
 
     /**
-     * Strip the 0.8 EL wrapper (${ ... }) from a condition string.
-     * If the expression is not wrapped, it is returned as-is.
-     * The inner content cannot be truly converted and will likely still need manual jq translation.
+     * Normalise a condition expression for use in a 1.0 when clause.
+     * The 1.0 spec supports (and encourages) ${ } wrappers, so they are preserved as-is.
+     * If the expression is not wrapped, it is returned trimmed.
      */
     protected static String stripExpressionWrapper(String expression) {
-        String trimmed = expression.trim();
-        if (trimmed.startsWith("${") && trimmed.endsWith("}")) {
-            String inner = trimmed.substring(2, trimmed.length() - 1).trim();
-            System.err.println("[WARN] EL expression '" + inner + "' may need manual translation to jq syntax.");
-            ReportCollector.get().addIssue(Severity.WARNING, Category.expression_conversion,
-                    "expression",
-                    "EL expression may need manual translation to jq syntax.",
-                    trimmed, inner,
-                    "Verify the jq expression produces the expected output.");
-            return inner;
-        }
-        return trimmed;
+        return expression.trim();
     }
 
     public static void printUsage() {
