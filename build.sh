@@ -5,14 +5,16 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+SDK_VERSION="${SDK_VERSION:-4.2.0.Final}"
+
 # Ensure the 0.8 SDK shaded coordinate is installed locally
-echo "Ensuring 0.8 SDK dependency is installed..."
-mvn dependency:get -q -Dartifact=io.serverlessworkflow:serverlessworkflow-api:4.1.0.Final
+echo "Ensuring SDK dependency is installed (version ${SDK_VERSION})..."
+mvn dependency:get -q -Dartifact=io.serverlessworkflow:serverlessworkflow-api:"${SDK_VERSION}"
 mvn install:install-file -q \
-  -Dfile="${HOME}/.m2/repository/io/serverlessworkflow/serverlessworkflow-api/4.1.0.Final/serverlessworkflow-api-4.1.0.Final.jar" \
+  -Dfile="${HOME}/.m2/repository/io/serverlessworkflow/serverlessworkflow-api/${SDK_VERSION}/serverlessworkflow-api-${SDK_VERSION}.jar" \
   -DgroupId=io.serverlessworkflow.v08 \
   -DartifactId=serverlessworkflow-api \
-  -Dversion=4.1.0.Final \
+  -Dversion="${SDK_VERSION}" \
   -Dpackaging=jar
 
 echo "Building with Maven..."
