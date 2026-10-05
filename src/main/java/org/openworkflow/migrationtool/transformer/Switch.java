@@ -3,6 +3,8 @@ package org.openworkflow.migrationtool.transformer;
 import org.openworkflow.migrationtool.report.MigrationReport.Category;
 import org.openworkflow.migrationtool.report.MigrationReport.Severity;
 import org.openworkflow.migrationtool.report.ReportCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +32,7 @@ import io.serverlessworkflow.api.types.Task;
 import io.serverlessworkflow.api.types.TaskItem;
 
 public class Switch {
+    private static final Logger log = LoggerFactory.getLogger(Switch.class);
 
     public static TaskItem handleSwitch(String name, SwitchState state,
                                         Map<String, String> eventTypeByName) {
@@ -137,8 +140,8 @@ public class Switch {
         if (cond.getEnd() != null) {
             return "end";
         }
-        System.err.println("[WARN] Event condition '" + eventRef + "' in switch state '"
-                + stateName + "' has no transition or end; emitting 'TODO' placeholder.");
+        log.warn("Event condition '{}' in switch state '{}' has no transition or end; emitting 'TODO' placeholder.",
+                eventRef, stateName);
         ReportCollector.get().addIssue(Severity.WARNING, Category.state_transformation,
                 "states[" + stateName + "].eventConditions[" + eventRef + "].transition",
                 "Event condition has no transition or end; a 'TODO' placeholder was emitted.",

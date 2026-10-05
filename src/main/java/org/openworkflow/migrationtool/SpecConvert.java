@@ -221,7 +221,7 @@ public class SpecConvert {
         JsonNode outputTree = validationMapper.readTree(outputPath.toFile());
         List<ValidationResult> validationResults = new OutputValidator().validate(outputTree);
         for (ValidationResult vr : validationResults) {
-            System.err.println("[" + vr.severity + "] validation: " + vr.path + " — " + vr.rule + ": " + vr.message);
+            log.warn("validation: {} — {}: {}", vr.path, vr.rule, vr.message);
             MigrationReport.Severity severity = vr.severity == ValidationResult.Severity.ERROR
                     ? MigrationReport.Severity.ERROR
                     : MigrationReport.Severity.WARNING;
@@ -234,7 +234,7 @@ public class SpecConvert {
                     vr.rule);
         }
         if (validationResults.isEmpty()) {
-            System.err.println("[INFO] Output validation passed with no findings.");
+            log.info("Output validation passed with no findings.");
         }
 
         // Finalise and write the migration report
@@ -290,18 +290,18 @@ public class SpecConvert {
     private static Document buildDocument(io.serverlessworkflow.api.Workflow src, String namespace) {
         // dsl — always "1.0.0" for output
         String dsl = "1.0.0";
-        System.err.println("[INFO] dsl set to " + dsl);
+        log.info("dsl set to {}", dsl);
 
         // namespace — 0.8 spec has no namespace field; fall back to "default"
-        System.err.println("[INFO] namespace set to " + namespace);
+        log.info("namespace set to {}", namespace);
 
         // name — mapped from 0.8 "id"
         String name = src.getId() != null ? src.getId() : "unnamed";
-        System.err.println("[INFO] name set to " + name);
+        log.info("name set to {}", name);
 
         // version — carried over as-is
         String version = src.getVersion() != null ? src.getVersion() : "0.0.1";
-        System.err.println("[INFO] version set to " + version);
+        log.info("version set to {}", version);
 
         Document document = new Document(dsl, namespace, name, version);
 
@@ -374,8 +374,8 @@ public class SpecConvert {
                 items.add(Callback.handleCallback(stateName, (CallbackState) state, eventTypeByName));
 
             } else {
-                System.err.println("[WARN] Unsupported state type for state '"
-                        + stateName + "' (" + state.getClass().getSimpleName() + "); skipping.");
+                log.warn("Unsupported state type for state '{}' ({}); skipping.",
+                        stateName, state.getClass().getSimpleName());
                 ReportCollector.get().addIssue(
                         Severity.ERROR,
                         Category.unsupported_feature,

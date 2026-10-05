@@ -3,6 +3,8 @@ package org.openworkflow.migrationtool.transformer;
 import org.openworkflow.migrationtool.report.MigrationReport.Category;
 import org.openworkflow.migrationtool.report.MigrationReport.Severity;
 import org.openworkflow.migrationtool.report.ReportCollector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +30,7 @@ import io.serverlessworkflow.api.types.Task;
 import io.serverlessworkflow.api.types.TaskItem;
 
 public class Callback {
+    private static final Logger log = LoggerFactory.getLogger(Callback.class);
 
     /**
      * Convert a 0.8 callback state to a 1.0 do task
@@ -123,8 +126,7 @@ public class Callback {
         if (state.getEnd() != null) {
             return "end";
         }
-        System.err.println("[WARN] Callback state '" + stateName
-                + "' has no transition or end; emitting 'TODO' placeholder.");
+        log.warn("Callback state '{}' has no transition or end; emitting 'TODO' placeholder.", stateName);
         ReportCollector.get().addIssue(Severity.ERROR, Category.state_transformation,
                 "states[" + stateName + "].transition",
                 "Callback state has no transition or end; a 'TODO' placeholder was emitted.",

@@ -58,7 +58,7 @@ public class util {
 
         // Fallback: unsupported action type — emit a set task with a warning marker
         String actionName = action.getName() != null ? action.getName() : "unknown";
-        System.err.println("[WARN] Action has no functionRef; emitting placeholder set task.");
+        log.warn("Action has no functionRef; emitting placeholder set task.");
         ReportCollector.get().addIssue(Severity.WARNING, Category.unsupported_feature,
                 "action(" + actionName + ")",
                 "Action has no functionRef; a placeholder set task was emitted.",
@@ -99,9 +99,8 @@ public class util {
             return new FlowDirective().withFlowDirectiveEnum(FlowDirectiveEnum.END);
         }
         // Neither transition nor end — emit a warning; fall-through is implicit in 1.0
-        System.err.println("[WARN] State '" + stateName
-                + "' has no transition or end; no 'then' directive will be set. "
-                + "Verify that sequential fall-through in the 1.0 do list is correct.");
+        log.warn("State '{}' has no transition or end; no 'then' directive will be set. "
+                + "Verify that sequential fall-through in the 1.0 do list is correct.", stateName);
         ReportCollector.get().addIssue(Severity.WARNING, Category.state_transformation,
                 "states[" + stateName + "].transition",
                 "State has no transition or end; no 'then' directive was emitted. "

@@ -1,5 +1,7 @@
 package org.openworkflow.migrationtool.transformer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -17,6 +19,7 @@ import io.serverlessworkflow.api.types.Task;
 import io.serverlessworkflow.api.types.TaskItem;
 
 public class Operation {
+    private static final Logger log = LoggerFactory.getLogger(Operation.class);
     /**
      * Convert a 0.8 operation state to one or more 1.0 tasks.
      *
@@ -37,8 +40,8 @@ public class Operation {
         List<Action> actions = state.getActions() != null ? state.getActions() : Collections.emptyList();
 
         boolean parallel = state.getActionMode() == OperationState.ActionMode.PARALLEL;
-        System.err.println("[INFO] Converting operation state '" + name + "' (actionMode="
-                + (parallel ? "parallel" : "sequential") + ", actions=" + actions.size() + ")");
+        log.info("Converting operation state '{}' (actionMode={}, actions={})",
+                name, parallel ? "parallel" : "sequential", actions.size());
 
         FlowDirective then = util.resolveThen(name, state);
 
