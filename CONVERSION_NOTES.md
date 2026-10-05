@@ -72,6 +72,8 @@ The 0.8 document is a flat object. The 1.0 document wraps everything inside two 
 | `id`           | `document.name`      | Direct copy; defaults to `"unnamed"`      |
 | `namespace`    | `document.namespace` | Set from `-n` flag; defaults to `"default"` |
 | `version`      | `document.version`   | Direct value copy; defaults to `"0.0.1"`  |
+| `name`         | `document.title`     | Copied if present; omitted if absent      |
+| `description`  | `document.summary`   | Copied if present; omitted if absent      |
 
 ---
 

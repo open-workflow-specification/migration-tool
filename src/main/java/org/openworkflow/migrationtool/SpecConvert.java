@@ -303,7 +303,19 @@ public class SpecConvert {
         String version = src.getVersion() != null ? src.getVersion() : "0.0.1";
         System.err.println("[INFO] version set to " + version);
 
-        return new Document(dsl, namespace, name, version);
+        Document document = new Document(dsl, namespace, name, version);
+
+        // title — mapped from 0.8 "name"
+        if (src.getName() != null) {
+            document.withTitle(src.getName());
+        }
+
+        // summary — mapped from 0.8 "description"
+        if (src.getDescription() != null) {
+            document.withSummary(src.getDescription());
+        }
+
+        return document;
     }
 
     // -----------------------------------------------------------------------
