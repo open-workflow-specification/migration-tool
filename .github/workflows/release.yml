@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*'
 
+env:
+  SWF_V08_VERSION: 4.1.0.Final
+
 jobs:
   build-native:
     name: Build (${{ matrix.os }})
@@ -34,12 +37,12 @@ jobs:
       - name: Install v08 SDK into local Maven repo
         shell: bash
         run: |
-          mvn dependency:get -q -Dartifact=io.serverlessworkflow:serverlessworkflow-api:4.1.0.Final
+          mvn dependency:get -q -Dartifact=io.serverlessworkflow:serverlessworkflow-api:${{ env.SWF_V08_VERSION }}
           mvn install:install-file -q \
-            -Dfile="${HOME}/.m2/repository/io/serverlessworkflow/serverlessworkflow-api/4.1.0.Final/serverlessworkflow-api-4.1.0.Final.jar" \
+            -Dfile="${HOME}/.m2/repository/io/serverlessworkflow/serverlessworkflow-api/${{ env.SWF_V08_VERSION }}/serverlessworkflow-api-${{ env.SWF_V08_VERSION }}.jar" \
             -DgroupId=io.serverlessworkflow.v08 \
             -DartifactId=serverlessworkflow-api \
-            -Dversion=4.1.0.Final \
+            -Dversion=${{ env.SWF_V08_VERSION }} \
             -Dpackaging=jar
 
       - name: Build native binary
