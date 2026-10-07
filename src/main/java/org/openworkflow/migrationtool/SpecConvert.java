@@ -74,12 +74,37 @@ public class SpecConvert {
 
     private static final Logger log = LoggerFactory.getLogger(SpecConvert.class);
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         if (args.length == 0 || "-h".equals(args[0]) || "--help".equals(args[0])) {
             util.printUsage();
             return;
         }
 
+        try {
+            run(args);
+        } catch (IllegalArgumentException e) {
+            log.error("Error: {}", e.getMessage());
+            log.error("Run with --help for usage information.");
+            System.exit(2);
+        } catch (java.nio.file.NoSuchFileException e) {
+            log.error("Error: Input file not found: {}", e.getFile());
+            System.exit(2);
+        } catch (IOException e) {
+            log.error("Error: {}", e.getMessage());
+            log.debug("I/O error detail", e);
+            System.exit(1);
+        } catch (Exception e) {
+            log.error("Unexpected error: {}", e.getMessage());
+            log.debug("Unexpected error detail", e);
+            System.exit(1);
+        }
+    }
+
+    /**
+     * Core logic extracted from main() so that exceptions can propagate to a single
+     * top-level handler that formats them as user-friendly CLI messages.
+     */
+    private static void run(String[] args) throws IOException {
         // Parse arguments: ows-migrate <input> [-o <output>]
         Path inputPath = null;
         Path outputPath = null;
@@ -90,10 +115,16 @@ public class SpecConvert {
         boolean strict = false;
         String reportFormat = "json";
 
+        // Track which flags have already been seen so duplicate uses can be reported.
+        java.util.Set<String> seen = new java.util.HashSet<>();
+
         for (int i = 0; i < args.length; i++) {
             if ("-o".equals(args[i]) || "--output".equals(args[i])) {
                 if (i + 1 >= args.length) {
                     throw new IllegalArgumentException(args[i] + " requires a file path argument.");
+                }
+                if (!seen.add("-o")) {
+                    log.warn("Warning: -o / --output specified more than once; using the last value.");
                 }
                 outputPath = Path.of(args[++i]);
             } else if ("-f".equals(args[i]) || "--format".equals(args[i])) {
@@ -102,16 +133,25 @@ public class SpecConvert {
                 } else if (!(args[i+1].equals("yaml") || args[i+1].equals("json"))){
                     throw new IllegalArgumentException(args[i] + " requires either 'json' or 'yaml' as format.");
                 }
+                if (!seen.add("-f")) {
+                    log.warn("Warning: -f / --format specified more than once; using the last value.");
+                }
                 outFormat = (args[++i]);
                 outFormatExplicit = true;
             } else if ("-n".equals(args[i]) || "--namespace".equals(args[i])) {
                 if (i + 1 >= args.length) {
                     throw new IllegalArgumentException(args[i] + " requires a namespace argument.");
                 }
+                if (!seen.add("-n")) {
+                    log.warn("Warning: -n / --namespace specified more than once; using the last value.");
+                }
                 namespace = (args[++i]);
             } else if ("-r".equals(args[i]) || "--report".equals(args[i])) {
                 if (i + 1 >= args.length) {
                     throw new IllegalArgumentException(args[i] + " requires a file path argument.");
+                }
+                if (!seen.add("-r")) {
+                    log.warn("Warning: -r / --report specified more than once; using the last value.");
                 }
                 reportPath = Path.of(args[++i]);
             } else if ("--report-format".equals(args[i])) {
@@ -119,12 +159,15 @@ public class SpecConvert {
                     throw new IllegalArgumentException("--report-format requires 'json' or 'markdown' as an argument.");
                 }
                 String val = args[++i];
-                 if ("json".equals(val)) {
+                if ("json".equals(val)) {
                     reportFormat = val;
                 } else if ("markdown".equals(val) || "md".equals(val)) {
                     reportFormat = "markdown";
                 } else {
                     throw new IllegalArgumentException("--report-format requires 'json', 'md', or 'markdown', got: '" + val + "'.");
+                }
+                if (!seen.add("--report-format")) {
+                    log.warn("Warning: --report-format specified more than once; using the last value.");
                 }
             } else if ("--strict".equals(args[i])) {
                 if (i + 1 >= args.length) {
@@ -138,6 +181,9 @@ public class SpecConvert {
                 } else {
                     throw new IllegalArgumentException("--strict requires 'true' or 'false', got: '" + val + "'.");
                 }
+                if (!seen.add("--strict")) {
+                    log.warn("Warning: --strict specified more than once; using the last value.");
+                }
             } else if (inputPath == null) {
                 inputPath = Path.of(args[i]);
             } else {
@@ -149,8 +195,16 @@ public class SpecConvert {
             throw new IllegalArgumentException("No input file specified.");
         }
 
+        if (!inputPath.toFile().exists()) {
+            throw new IllegalArgumentException("Input file does not exist: " + inputPath);
+        }
+
+        if (!inputPath.toFile().isFile()) {
+            throw new IllegalArgumentException("Input path is not a file: " + inputPath);
+        }
+
         // If -o was given without -f, infer the format from the output file extension.
-        // If both were given explicitly and they conflict, throw.
+        // If both were given explicitly and they conflict, warn.
         if (outputPath != null) {
             String outputFileName = outputPath.getFileName().toString().toLowerCase();
             boolean isJsonExt = outputFileName.endsWith(".json");
@@ -349,6 +403,7 @@ public class SpecConvert {
         for (State state : src.getStates()) {
             String stateName = state.getName() != null ? state.getName() : "unnamed";
 
+            try {
             if (state instanceof InjectState) {
                 items.add(Inject.handleInject(stateName, (InjectState) state));
 
@@ -382,6 +437,15 @@ public class SpecConvert {
                         "states[" + stateName + "]",
                         "State type " + state.getClass().getSimpleName() + " has no 1.0 equivalent; state was skipped.",
                         null, null, "Manually implement this state in the converted workflow.");
+            }
+            } catch (IllegalArgumentException e) {
+                log.error("Error converting state '{}': {}; skipping.", stateName, e.getMessage());
+                ReportCollector.get().addIssue(
+                        Severity.ERROR,
+                        Category.unsupported_feature,
+                        "states[" + stateName + "]",
+                        "State could not be converted: " + e.getMessage(),
+                        null, null, "Fix the source workflow and re-run the migration.");
             }
         }
 

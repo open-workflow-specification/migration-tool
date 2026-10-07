@@ -1,0 +1,17 @@
+{
+  "migration_summary" : {
+    "source_file" : "event.json",
+    "source_version" : "0.8",
+    "target_version" : "1.0.0",
+    "migration_date" : "2026-10-07T14:15:40.710492511Z",
+    "overall_status" : "success",
+    "statistics" : {
+      "total_states" : 1,
+      "migrated_states" : 1,
+      "warnings_count" : 0,
+      "errors_count" : 0
+    }
+  },
+  "issues" : [ ],
+  "manual_migration_tasks" : [ ]
+}
