@@ -1,0 +1,46 @@
+---
+document:
+  dsl: 1.0.0
+  namespace: default
+  name: monitorvitals
+  version: 1.0
+  title: Monitor Vitals Workflow
+  summary: Monitor patient vitals and react to threshold events
+do:
+- MonitorVitals:
+    then: end
+    listen:
+      to:
+        any:
+        - with:
+            type: com.hospital.vitals.temperature.high
+        - with:
+            type: com.hospital.vitals.bloodpressure.high
+        - with:
+            type: com.hospital.vitals.respiration.high
+      read: data
+    foreach:
+      item: item
+      at: index
+      do:
+      - highbodytemperature:
+          do:
+          - sendTylenolOrder:
+              call: sendTylenolOrder
+              with:
+                patientid: "${ .patientId }"
+          if: .item.type == "com.hospital.vitals.temperature.high"
+      - highbloodpressure:
+          do:
+          - callNurse:
+              call: callNurse
+              with:
+                patientid: "${ .patientId }"
+          if: .item.type == "com.hospital.vitals.bloodpressure.high"
+      - highrespirationrate:
+          do:
+          - callPulmonologist:
+              call: callPulmonologist
+              with:
+                patientid: "${ .patientId }"
+          if: .item.type == "com.hospital.vitals.respiration.high"

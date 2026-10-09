@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+env:
+  SWF_V08_VERSION: 4.1.0.Final
+
+jobs:
+  build-native:
+    name: Build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact: ows-migrate-linux
+            binary: target/ows-migrate
+          - os: macos-latest
+            artifact: ows-migrate-macos
+            binary: target/ows-migrate
+          - os: windows-latest
+            artifact: ows-migrate-windows.exe
+            binary: target/ows-migrate.exe
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up GraalVM JDK 21
+        uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+
+      - name: Install v08 SDK into local Maven repo
+        shell: bash
+        run: |
+          mvn dependency:get -q -Dartifact=io.serverlessworkflow:serverlessworkflow-api:${{ env.SWF_V08_VERSION }}
+          mvn install:install-file -q \
+            -Dfile="${HOME}/.m2/repository/io/serverlessworkflow/serverlessworkflow-api/${{ env.SWF_V08_VERSION }}/serverlessworkflow-api-${{ env.SWF_V08_VERSION }}.jar" \
+            -DgroupId=io.serverlessworkflow.v08 \
+            -DartifactId=serverlessworkflow-api \
+            -Dversion=${{ env.SWF_V08_VERSION }} \
+            -Dpackaging=jar
+
+      - name: Build native binary
+        run: mvn package -Pnative -q
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.binary }}
+
+  release:
+    name: Create release
+    needs: build-native
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all binaries
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Rename artifacts
+        run: |
+          mv artifacts/ows-migrate-linux/ows-migrate        ows-migrate-linux
+          mv artifacts/ows-migrate-macos/ows-migrate        ows-migrate-macos
+          mv artifacts/ows-migrate-windows.exe/ows-migrate.exe ows-migrate-windows.exe
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ows-migrate-linux
+            ows-migrate-macos
+            ows-migrate-windows.exe
+          generate_release_notes: true
