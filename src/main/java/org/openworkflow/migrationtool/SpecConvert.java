@@ -214,9 +214,11 @@ public class SpecConvert {
                 // Both -o and -f supplied — use -o format
                 boolean matches = "json".equals(outFormat) ? isJsonExt : isYamlExt;
                 if (!matches) {
+                    String inferredFormat = isYamlExt ? "yaml" : "json";
                     log.warn(
                             "Output path '" + outputPath.getFileName() + "' does not match -f '" + outFormat + "'. "
-                            + "Using extension format: " + (isYamlExt ? "yaml" : "json") + ".");
+                            + "Using extension format: " + inferredFormat + ".");
+                    outFormat = inferredFormat;
                 }
             } else if (isJsonExt) {
                 // -o given alone with a .json extension — infer json format
@@ -228,16 +230,15 @@ public class SpecConvert {
         // Validate that an explicit --report path extension matches --report-format
         if (reportPath != null) {
             String reportFileName = reportPath.getFileName().toString().toLowerCase();
-            boolean extensionMatchesFormat;
-            if ("markdown".equals(reportFormat) || "md".equals(reportFormat)) {
-                extensionMatchesFormat = reportFileName.endsWith(".md") || reportFileName.endsWith(".markdown");
-            } else {
-                extensionMatchesFormat = reportFileName.endsWith(".json");
-            }
+            boolean isMarkdownExt = reportFileName.endsWith(".md") || reportFileName.endsWith(".markdown");
+            boolean isJsonExt = reportFileName.endsWith(".json");
+            boolean extensionMatchesFormat = "markdown".equals(reportFormat) ? isMarkdownExt : isJsonExt;
             if (!extensionMatchesFormat) {
+                String inferredFormat = isMarkdownExt ? "markdown" : "json";
                 log.warn(
                         "Report path '" + reportPath.getFileName() + "' does not match --report-format '" + reportFormat + "'. "
-                        + "Using extension format: " + ("markdown".equals(reportFormat) ? ".md or .markdown" : ".json") + ".");
+                        + "Using extension format: " + inferredFormat + ".");
+                reportFormat = inferredFormat;
             }
         }
 
