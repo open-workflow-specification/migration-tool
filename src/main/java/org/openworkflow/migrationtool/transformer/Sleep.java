@@ -54,7 +54,7 @@ public class Sleep {
         if (iso8601Duration == null) iso8601Duration = "PT0S";
 
         Pattern pattern = Pattern.compile(
-            "P(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?"
+            "P(?=\\d+[YMD]|T\\d+[HMS])(?:(\\d+)Y)?(?:(\\d+)M)?(?:(\\d+)D)?(?:T(?:(\\d+)H)?(?:(\\d+)M)?(?:(\\d+)S)?)?"
         );
         Matcher m = pattern.matcher(iso8601Duration);
 
